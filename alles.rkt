@@ -43,8 +43,15 @@
 (define (handle-key-event key-event)
   (define single-key-descriptor (get-single-key-descriptor key-event))
   (match single-key-descriptor
-    ["q" (send frame show #f)]
-    ["m" (system "ydotool mousemove 100 100")]
+    ["q"            (send frame show #f)]
+    ["n"            (begin (system "firefox --new-tab 'search.nixos.org';
+                                    sleep 0.5;
+                                    ydotool key 125:1 15:1 15:0 125:0")
+                            (send frame show #f))]
+    ["(Ctrl n)"    (begin (system "firefox --new-tab 'search.nixos.org/options';
+                                    sleep 0.5;
+                                    ydotool key 125:1 15:1 15:0 125:0")
+                          (send frame show #f))]
     [_ (send msg set-label single-key-descriptor)]))
 
 (define my-canvas%
@@ -60,6 +67,3 @@
 
 (send my-canvas focus)
 (send frame show #t)
-(send frame has-focus?)
-(send frame is-enabled?)
-(send frame is-shown?)
