@@ -44,6 +44,7 @@
   (define single-key-descriptor (get-single-key-descriptor key-event))
   (match single-key-descriptor
     ["q" (send frame show #f)]
+    ["m" (system "ydotool mousemove 100 100")]
     [_ (send msg set-label single-key-descriptor)]))
 
 (define my-canvas%
