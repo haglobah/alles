@@ -28,6 +28,7 @@
         devshells.default = {
           packages = [
             pkgs.racket
+            pkgs.ydotool
           ];
           commands = [];
         };
