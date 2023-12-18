@@ -1,47 +1,50 @@
 #lang racket/base
 
-(require racket/gui)
+(require racket/gui
+         racket/match
+         threading)
 
-; (define frame (new frame% [style '(float)] [label "Example"]))
-
-
-; ; Make a button in the frame
-; (new button% [parent frame]
-;              [label "Click Me"]
-;              ; Callback procedure for a button click:
-;              [callback (lambda (button event)
-;                          (send msg set-label "Button click"))])
-
-; (send frame show #t)
-
-; (new canvas% [parent frame]
-;              [paint-callback
-;               (lambda (canvas dc)
-;                 (send dc set-scale 3 3)
-;                 (send dc set-text-foreground "blue")
-;                 (send dc draw-text "Don't Panic!" 0 0))])
-
-
-(define frame (new frame%
-                   [label "Example"]
-                   [x 300]
-                   [y 300]
-                   [width 300]
-                   [height 300]
-                   ))
+(define frame
+  (new frame% [label "alles"]
+              [x 300] [y 300]
+              [width 300] [height 100]))
 
 (define msg (new message% [parent frame]
+                          [font (make-object font% 48 'modern)]
                           [label "Nothing happened so far."]))
 
-(define (get-key keycode)
+(define (keycode->string keycode)
   (cond
     [(symbol? keycode) (symbol->string keycode)]
     [(char? keycode) (string keycode)]
     [else "how?"]))
 
+(define (wrap-key-descriptor key-descriptor condition modifier-name)
+  (if condition
+      (string-append "(" modifier-name " " key-descriptor ")")
+      key-descriptor))
+
+(define (cons-single-key-descriptor key C? M?)
+  (~> key
+      (wrap-key-descriptor M? "Meta")
+      (wrap-key-descriptor C? "Ctrl")
+      ))
+
+(define (get-single-key-descriptor key-event)
+  (define keycode (send key-event get-key-code))
+  (define ctrl-down? (send key-event get-control-down))
+  (define meta-down? (send key-event get-meta-down))
+  (define keystring (cons-single-key-descriptor (keycode->string keycode) ctrl-down? meta-down?))
+  (match keystring
+    ["q" (begin (send frame show #f) keystring)]
+    [_ keystring])
+)
+  
 (define (handle-key-event key-event)
-  (define keypress (get-key (send key-event get-key-code)))
-  (send msg set-label keypress))
+  (define single-key-descriptor (get-single-key-descriptor key-event))
+  (match single-key-descriptor
+    ["q" (send frame show #f)]
+    [_ (send msg set-label single-key-descriptor)]))
 
 (define my-canvas%
   (class canvas% ; The base class is canvas%
