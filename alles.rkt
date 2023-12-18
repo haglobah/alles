@@ -28,7 +28,7 @@
                    [y 300]
                    [width 300]
                    [height 300]
-                   [style '(float)]))
+                   ))
 
 (define msg (new message% [parent frame]
                           [label "Nothing happened so far."]))
@@ -39,16 +39,23 @@
     [(char? keycode) (string keycode)]
     [else "how?"]))
 
+(define (handle-key-event key-event)
+  (define keypress (get-key (send key-event get-key-code)))
+  (send msg set-label keypress))
+
 (define my-canvas%
   (class canvas% ; The base class is canvas%
     ; Define overriding method to handle keyboard events
     (define/override (on-char key-event)
-      (define keypress (get-key (send key-event get-key-code)))
-      (send msg set-label keypress))
+      (handle-key-event key-event))
     ; Call the superclass init, passing on all init args
     (super-new)))
  
 ; Make a canvas that handles events in the frame
-(new my-canvas% [parent frame])
+(define my-canvas (new my-canvas% [parent frame]))
 
+(send my-canvas focus)
 (send frame show #t)
+(send frame has-focus?)
+(send frame is-enabled?)
+(send frame is-shown?)
