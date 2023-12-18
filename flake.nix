@@ -26,6 +26,9 @@
         # Equivalent to  inputs'.nixpkgs.legacyPackages.hello;
         # packages.default = pkgs.hello;
         devshells.default = {
+          env = [
+            { name = "YDOTOOL_SOCKET"; value = "/tmp/.ydotool_socket"; } 
+          ];
           packages = [
             pkgs.racket
             pkgs.ydotool

@@ -25,4 +25,4 @@
                   48
                   'modern))
     (button "exec-things"
-      (λ () (system "YDOTOOL_SOCKET=/tmp/.ydotool_socket ydotool mousemove 100 100"))))))
+      (λ () (system "ydotool mousemove 100 100"))))))
