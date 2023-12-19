@@ -83,17 +83,19 @@
   (if (not (pair? chord-list))
       ""
       (<> (if (list? (car chord-list))
-              (<> (caar chord-list) ":1 "
+              (<> " " (caar chord-list) ":1"
                   (nesting->sequence (cdar chord-list))
-                  (caar chord-list) ":0 ")
-              (<> (car chord-list) ":1 " (car chord-list) ":0 "))
+                  " " (caar chord-list) ":0")
+              (<> " " (car chord-list) ":1 " (car chord-list) ":0"))
           (nesting->sequence (cdr chord-list)))))
 
-(define (y keychord)
+(define (keys keychord)
   (~>> keychord
        (map symbol->keycode)
        (inspect)
        (nesting->sequence)
+       (inspect)
+       (<> "ydotool keys")
        (inspect)
   ))
 
@@ -109,7 +111,9 @@
   (define single-key-descriptor (get-single-key-descriptor key-event))
   (match single-key-descriptor
     ["q"            (send frame show #f)]
-    ["n"            (run "firefox --new-tab 'search.nixos.org'" "sleep 0.1" (y '((Super tab) b)))]
+    ["n"            (run "firefox --new-tab 'search.nixos.org'"
+                         "sleep 0.1"
+                         (keys '((Super (Super tab)) b c d)))]
     ["(Ctrl n)"     (run "firefox --new-tab 'search.nixos.org/options'")]
     [_ (send msg set-label single-key-descriptor)]))
 
