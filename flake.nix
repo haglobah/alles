@@ -71,17 +71,17 @@
                 ]}
           '';
         };
-        devshells.default = {
-          env = [
-            { name = "YDOTOOL_SOCKET"; value = "/tmp/.ydotool_socket"; } 
-          ];
-          packages = [
-            pkgs.racket
-            pkgs.ydotool
-            pkgs.fontconfig.lib
-          ];
-          commands = [];
-        };
+        # devshells.default = {
+        #   env = [
+        #     { name = "YDOTOOL_SOCKET"; value = "/tmp/.ydotool_socket"; } 
+        #   ];
+        #   packages = [
+        #     pkgs.racket
+        #     pkgs.ydotool
+        #     pkgs.fontconfig.lib
+        #   ];
+        #   commands = [];
+        # };
       };
       flake = {
         # The usual flake attributes can be defined here, including system-
