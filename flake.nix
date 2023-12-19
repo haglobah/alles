@@ -7,7 +7,7 @@
     devshell.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ flake-parts, ... }:
+  outputs = inputs@{ nixpkgs, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.devshell.flakeModule
@@ -24,7 +24,6 @@
         # system.
 
         # Equivalent to  inputs'.nixpkgs.legacyPackages.hello;
-        packages.default = (import ./alles.nix { inherit pkgs; });
         devshells.default = {
           env = [
             { name = "YDOTOOL_SOCKET"; value = "/tmp/.ydotool_socket"; } 
@@ -37,7 +36,13 @@
           commands = [];
         };
       };
-      flake = {
+      flake = 
+      let 
+        system = "x86_64-linux";
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
+        packages.x86_64-linux.default = (import ./alles.nix { inherit pkgs; });
         # The usual flake attributes can be defined here, including system-
         # agnostic ones like nixosModule and system-enumerating ones, although
         # those are more easily expressed in perSystem.
