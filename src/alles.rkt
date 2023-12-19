@@ -2,7 +2,7 @@
 
 (require racket/gui
          racket/match
-         threading)
+         "threading.rkt")
 
 (define frame
   (new frame% [label "alles"]
@@ -23,6 +23,8 @@
   (if condition
       (string-append "(" modifier-name " " key-descriptor ")")
       key-descriptor))
+
+
 
 (define (cons-single-key-descriptor key C? M?)
   (~> key
