@@ -95,26 +95,35 @@
        (inspect)
        (nesting->sequence)
        (inspect)
-       (<> "ydotool keys")
+       (<> "ydotool key")
        (inspect)
   ))
+
+(define (text string)
+  (~>> string
+       (<> "ydotool type --key-delay=1 '" _ "'")))
 
 (define (run . subcommands)
   (~> subcommands
       (bash-serialize)
       (collapse)
       ; (switch-app!)
-      ; (system)
+      (system)
   ))
 
 (define (handle-key-event key-event)
   (define single-key-descriptor (get-single-key-descriptor key-event))
   (match single-key-descriptor
     ["q"            (send frame show #f)]
+    ["(Ctrl w)"            (send frame show #f)]
     ["n"            (run "firefox --new-tab 'search.nixos.org'"
                          "sleep 0.1"
                          (keys '((Super (Super tab)) b c d)))]
-    ["(Ctrl n)"     (run "firefox --new-tab 'search.nixos.org/options'")]
+    ["(Ctrl n)"     (run "firefox --new-tab 'search.nixos.org/options'"
+                         (keys '((Super tab)))
+                         "sleep 1"
+                         )]
+    ["s"            (run (keys '((Super tab))) (text "surrealdb"))]
     [_ (send msg set-label single-key-descriptor)]))
 
 (send my-canvas focus)
