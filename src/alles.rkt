@@ -9,11 +9,8 @@
 (define frame
   (new frame% [label "alles"]
               [x 300] [y 300]
+              [style '()]
               [width 300] [height 100]))
-
-(define msg (new message% [parent frame]
-                          [font (make-object font% 48 'modern)]
-                          [label "Nothing happened so far."]))
 
 (define (keycode->string keycode)
   (cond
@@ -38,7 +35,22 @@
   (define meta-down? (send key-event get-meta-down))
   (define keystring (cons-single-key-descriptor (keycode->string keycode) ctrl-down? meta-down?))
   keystring)
-  
+
+(define my-canvas%
+  (class canvas% ; The base class is canvas%
+    ; Define overriding method to handle keyboard events
+    (define/override (on-char key-event)
+      (handle-key-event key-event))
+    ; Call the superclass init, passing on all init args
+    (super-new)))
+ 
+; Make a canvas that handles events in the frame
+(define my-canvas (new my-canvas% [parent frame]))
+
+(define msg (new message% [parent frame]
+                          [font (make-object font% 48 'modern)]
+                          [label "Nothing happened so far."]))
+
 (define (handle-key-event key-event)
   (define single-key-descriptor (get-single-key-descriptor key-event))
   (match single-key-descriptor
@@ -52,17 +64,6 @@
                                     ydotool key 125:1 15:1 15:0 125:0")
                           (send frame show #f))]
     [_ (send msg set-label single-key-descriptor)]))
-
-(define my-canvas%
-  (class canvas% ; The base class is canvas%
-    ; Define overriding method to handle keyboard events
-    (define/override (on-char key-event)
-      (handle-key-event key-event))
-    ; Call the superclass init, passing on all init args
-    (super-new)))
- 
-; Make a canvas that handles events in the frame
-(define my-canvas (new my-canvas% [parent frame]))
 
 (send my-canvas focus)
 (send frame show #t)
