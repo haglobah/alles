@@ -1,6 +1,8 @@
 #lang racket/base
 
-(require racket/gui
+(require racket/gui/base
+         racket/class
+         racket/system
          racket/match
          "threading.rkt")
 
