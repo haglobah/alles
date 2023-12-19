@@ -2,6 +2,8 @@
 
 pkgs.stdenv.mkDerivation {
   name = "alles";
+  pname = "alles";
+  version = "0.1.0";
   src = ./src;
 
   buildInputs = [
