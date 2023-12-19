@@ -35,10 +35,7 @@
   (define ctrl-down? (send key-event get-control-down))
   (define meta-down? (send key-event get-meta-down))
   (define keystring (cons-single-key-descriptor (keycode->string keycode) ctrl-down? meta-down?))
-  (match keystring
-    ["q" (begin (send frame show #f) keystring)]
-    [_ keystring])
-)
+  keystring)
   
 (define (handle-key-event key-event)
   (define single-key-descriptor (get-single-key-descriptor key-event))
