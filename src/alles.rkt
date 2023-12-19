@@ -24,8 +24,6 @@
       (string-append "(" modifier-name " " key-descriptor ")")
       key-descriptor))
 
-
-
 (define (cons-single-key-descriptor key C? M?)
   (~> key
       (wrap-key-descriptor M? "Meta")
