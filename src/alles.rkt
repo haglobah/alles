@@ -58,11 +58,11 @@
     ["n"            (begin (system "firefox --new-tab 'search.nixos.org';
                                     sleep 0.5;
                                     ydotool key 125:1 15:1 15:0 125:0")
-                            (send frame show #f))]
+                            )]
     ["(Ctrl n)"    (begin (system "firefox --new-tab 'search.nixos.org/options';
                                     sleep 0.5;
                                     ydotool key 125:1 15:1 15:0 125:0")
-                          (send frame show #f))]
+                            )]
     [_ (send msg set-label single-key-descriptor)]))
 
 (send my-canvas focus)
