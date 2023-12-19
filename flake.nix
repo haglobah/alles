@@ -26,14 +26,16 @@
         # Equivalent to  inputs'.nixpkgs.legacyPackages.hello;
         devshells.default = {
           env = [
-            { name = "YDOTOOL_SOCKET"; value = "/tmp/.ydotool_socket"; } 
+            # { name = "YDOTOOL_SOCKET"; value = "/tmp/.ydotool_socket"; } 
           ];
           packages = [
             pkgs.racket
             pkgs.ydotool
             pkgs.fontconfig.lib
           ];
-          commands = [];
+          commands = [
+            { name = "ra"; command = "racket src/alles.rkt"; help = "Runs the 'alles.rkt' program."; }
+          ];
         };
       };
       flake = 
