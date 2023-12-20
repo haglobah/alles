@@ -171,6 +171,8 @@
 
             [(list "c:1" "c:0" "h:1" "h:0")
             (run msg chord (clip "git@github.com/haglobah"))]
+            [(list "c:1" "c:0" "f:1" "f:0")
+            (run msg chord (clip "nix flake init --template github:haglobah/flakes"))]
 
             [_ (update-label! msg chord)]
           )]))))
