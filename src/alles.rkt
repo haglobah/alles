@@ -130,6 +130,8 @@
 
 (define (fire link)
   (<> "firefox --new-tab '" link "'"))
+(define (clip text)
+  (<> "echo -n '" text "' | wl-copy"))
 
 (define (append-app-switch subcommands)
   (++ subcommands (keys '((Super tab)))))
@@ -166,6 +168,9 @@
             (run msg chord (fire "https://search.nixos.org/options"))]
             [(list "s:1" "s:0" "r:1" "r:0")
             (run msg chord (fire "https://docs.racket-lang.org/search/index.html"))]
+
+            [(list "c:1" "c:0" "h:1" "h:0")
+            (run msg chord (clip "git@github.com/haglobah"))]
 
             [_ (update-label! msg chord)]
           )]))))
