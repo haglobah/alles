@@ -12,7 +12,8 @@
   (new frame% [label "alles"]
               [x 300] [y 300]
               [style '()]
-              [width 300] [height 100]))
+              [width 900] [height 100]
+              [alignment '(left center)]))
 
 (define my-canvas%
   (class canvas% ; The base class is canvas%
@@ -28,44 +29,12 @@
 (define my-canvas (new my-canvas% [parent frame]))
 
 (define msg (new message% [parent frame]
-                          [font (make-object font% 48 'modern)]
-                          [label "Nothing happened so far."]))
+                          [font (make-object font% 16 'modern)]
+                          [label "Nothing happened\n so far."]
+                          [vert-margin 12]	 
+   	 	                    [horiz-margin 12]))
 
 (define-syntax <> (make-rename-transformer #'string-append))
-
-(define (keycode->string keycode)
-  (cond
-    [(symbol? keycode) (symbol->string keycode)]
-    [(char? keycode) (string keycode)]
-    [else "how?"]))
-
-(define (wrap-key-descriptor key-descriptor condition modifier-name)
-  (if condition
-      (string-append "(" modifier-name " " key-descriptor ")")
-      key-descriptor))
-
-(define (format-key press release)
-  (if (string=? press "release")
-      (<> release ":0")
-      (<> press ":1")))
-
-(define (cons-single-key-descriptor press release C? M?)
-  (~> (format-key press release)
-      (wrap-key-descriptor M? "Meta")
-      (wrap-key-descriptor C? "Ctrl")
-      ))
-
-(define (get-single-key-descriptor key-event)
-  (define keypress-code (send key-event get-key-code))
-  (define keyrelease-code (send key-event get-key-release-code))
-  (define ctrl-down? (send key-event get-control-down))
-  (define meta-down? (send key-event get-meta-down))
-  (define keystring
-    (cons-single-key-descriptor (keycode->string keypress-code)
-                                (keycode->string keyrelease-code)
-                                ctrl-down?
-                                meta-down?))
-  keystring)
 
 (define (bash-serialize subcommands)
   (map (λ (cmd) (<> cmd "; ")) subcommands))
@@ -123,24 +92,59 @@
       (system)
   ))
 
+(define (keycode->string keycode)
+  (cond
+    [(symbol? keycode) (symbol->string keycode)]
+    [(char? keycode) (string keycode)]
+    [else "how?"]))
+
+(define (wrap-key-descriptor key-descriptor condition modifier-name)
+  (if condition
+      (string-append "(" modifier-name " " key-descriptor ")")
+      key-descriptor))
+
+(define (format-key press release)
+  (if (string=? press "release")
+      (<> release ":0")
+      (<> press ":1")))
+
+(define (cons-single-key-descriptor press release C? M?)
+  (~> (format-key press release)
+      ; (wrap-key-descriptor M? "Meta")
+      ; (wrap-key-descriptor C? "Ctrl")
+      ))
+
+(define (get-single-key-descriptor key-event)
+  (define keypress-code (send key-event get-key-code))
+  (define keyrelease-code (send key-event get-key-release-code))
+  (define ctrl-down? (send key-event get-control-down))
+  (define meta-down? (send key-event get-meta-down))
+  (define keystring
+    (cons-single-key-descriptor (keycode->string keypress-code)
+                                (keycode->string keyrelease-code)
+                                ctrl-down?
+                                meta-down?))
+  keystring)
+
 (define handle-key-event
   (let ([chord ""])
     (λ (key-event)
       (define single-key-descriptor (get-single-key-descriptor key-event))
       (set! chord (<> chord " " single-key-descriptor))
       (match (list chord single-key-descriptor)
-        [(list _ "q:1")   (send frame show #f)]
-        [(list _ "(Ctrl w)")     (send frame show #f)]
-        [(list _ "g:1")   (set! chord "")]
-        ["n"            (run "firefox --new-tab 'search.nixos.org'"
-                            "sleep 0.1"
-                            (keys '((Super (Super tab)) b c d)))]
-        ["(Ctrl n)"     (run "firefox --new-tab 'search.nixos.org/options'"
-                            (keys '((Super tab)))
-                            "sleep 1"
-                            )]
-        ["s"            (run (keys '((Super tab))) (text "surrealdb"))]
-        [_ (send msg set-label chord)]))))
+        [(list _ "q:1")                       (send frame show #f)]
+        [(list " control:1 w:1 w:0" _)        (send frame show #f)]
+        [(list " g:1 g:0" _ )                 (begin (inspect chord)
+                                                     (set! chord ""))]
+        [(list " n:1 n:0" _)                   (run "firefox --new-tab 'search.nixos.org'"
+                                                "sleep 0.1"
+                                                (keys '((Super (Super tab)) b c d)))]
+        ["(Ctrl n)"                           (run "firefox --new-tab 'search.nixos.org/options'"
+                                                (keys '((Super tab)))
+                                                "sleep 1"
+                                                )]
+        ["s"                                  (run (keys '((Super tab))) (text "surrealdb"))]
+        [_                                    (send msg set-label chord)]))))
 
 (send my-canvas focus)
 (send frame show #t)
