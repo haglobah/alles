@@ -46,5 +46,6 @@ pkgs.stdenv.mkDerivation {
           readline
           sqlite
         ]}
+      --prefix YDOTOOL_SOCKET : /tmp/.ydotool_socket
   '';
 }
