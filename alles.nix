@@ -45,7 +45,7 @@ pkgs.stdenv.mkDerivation {
           poppler
           readline
           sqlite
-        ]}
+        ]} \
       --prefix YDOTOOL_SOCKET : /tmp/.ydotool_socket
   '';
 }
