@@ -84,14 +84,6 @@
   (~>> string
        (<> "ydotool type --key-delay=1 '" _ "'")))
 
-(define (run . subcommands)
-  (~> subcommands
-      (bash-serialize)
-      (collapse)
-      ; (switch-app!)
-      (system)
-  ))
-
 (define (keycode->string keycode)
   (cond
     [(symbol? keycode) (symbol->string keycode)]
@@ -126,25 +118,51 @@
                                 meta-down?))
   keystring)
 
+(define (++ list el)
+  (reverse (cons el (reverse list))))
+
+(define (update-label! msg chord)
+  (send msg set-label (apply string-append chord)))
+
+(define-syntax-rule (reset! chord)  (set! chord '()))
+
+(define (fire link)
+  (<> "firefox --new-tab '" link "'"))
+
+(define (append-app-switch subcommands)
+  (++ subcommands (keys '((Super tab)))))
+
+; (define (append-chord-reset subcommands)
+;   (++ subcommands (reset! chord)))
+
+(define (run . subcommands)
+  (~> subcommands
+      (append-app-switch)
+      ; (append-chord-reset)
+      (bash-serialize)
+      (collapse)
+      (system)
+  ))
+
 (define handle-key-event
-  (let ([chord ""])
+  (let ([chord '()])
     (λ (key-event)
       (define single-key-descriptor (get-single-key-descriptor key-event))
-      (set! chord (<> chord " " single-key-descriptor))
-      (match (list chord single-key-descriptor)
-        [(list _ "q:1")                       (send frame show #f)]
-        [(list " control:1 w:1 w:0" _)        (send frame show #f)]
-        [(list " g:1 g:0" _ )                 (begin (inspect chord)
-                                                     (set! chord ""))]
-        [(list " n:1 n:0" _)                   (run "firefox --new-tab 'search.nixos.org'"
-                                                "sleep 0.1"
-                                                (keys '((Super (Super tab)) b c d)))]
-        ["(Ctrl n)"                           (run "firefox --new-tab 'search.nixos.org/options'"
-                                                (keys '((Super tab)))
-                                                "sleep 1"
-                                                )]
-        ["s"                                  (run (keys '((Super tab))) (text "surrealdb"))]
-        [_                                    (send msg set-label chord)]))))
+      (set! chord (++ chord single-key-descriptor))
+      (match chord
+        [(list a ... "q:1") (send frame show #f)] [(list a ... "control:1" "w:1" "w:0") (send frame show #f)]
+        [(list a ... "g:1" "g:0") (reset! chord) (update-label! msg chord)]
+
+        [(list "s:1" "s:0" "n:1" "n:0")
+         (run (fire "https://search.nixos.org")) (reset! chord) (update-label! msg chord)]
+
+        [(list "s:1" "s:0" "o:1" "o:0")
+         (run (fire "https://search.nixos.org/options"))]
+        [(list "s:1" "s:0" "r:1" "r:0")
+         (run (fire "https://docs.racket-lang.org/search/index.html"))]
+        [_
+         (update-label! msg chord)]
+         ))))
 
 (send my-canvas focus)
 (send frame show #t)
