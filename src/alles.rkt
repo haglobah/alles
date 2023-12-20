@@ -177,7 +177,7 @@
             (run msg chord "gnome-terminal")]
             [(list "r:1" "r:0" "c:1" "c:0")
             (run msg chord "code")]
-            [(list "r:1" "r:0" "c:1" "c:0")
+            [(list "r:1" "r:0" "e:1" "e:0")
             (run msg chord "emacs")]
 
             [(list "c:1" "c:0" "h:1" "h:0")
