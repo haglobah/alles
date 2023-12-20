@@ -168,6 +168,17 @@
             (run msg chord (fire "https://search.nixos.org/options"))]
             [(list "s:1" "s:0" "r:1" "r:0")
             (run msg chord (fire "https://docs.racket-lang.org/search/index.html"))]
+            
+            [(list "r:1" "r:0" "f:1" "f:0")
+            (run msg chord "firefox")]
+            [(list "r:1" "r:0" "o:1" "o:0")
+            (run msg chord "obsidian")]
+            [(list "r:1" "r:0" "t:1" "t:0")
+            (run msg chord "gnome-terminal")]
+            [(list "r:1" "r:0" "c:1" "c:0")
+            (run msg chord "code")]
+            [(list "r:1" "r:0" "c:1" "c:0")
+            (run msg chord "emacs")]
 
             [(list "c:1" "c:0" "h:1" "h:0")
             (run msg chord (clip "git@github.com/haglobah"))]
