@@ -20,17 +20,19 @@
     ; Define overriding method to handle keyboard events
     (define/override (on-char key-event)
       (handle-key-event key-event))
-    (define/override (on-tab-in)
-      (handle-key-event 'tab-in))
+    (define/override (on-focus bool)
+      (unless bool (handle-key-event 'lost-focus)))
     ; Call the superclass init, passing on all init args
     (super-new)))
  
 ; Make a canvas that handles events in the frame
 (define my-canvas (new my-canvas% [parent frame]))
 
+(define initial-label "\n\nPlease insert a key sequence.")
+
 (define msg (new message% [parent frame]
                           [font (make-object font% 16 'modern)]
-                          [label "Nothing happened\n so far."]
+                          [label initial-label]
                           [vert-margin 12]	 
    	 	                    [horiz-margin 12]))
 
@@ -135,34 +137,38 @@
 ; (define (append-chord-reset subcommands)
 ;   (++ subcommands (reset! chord)))
 
-(define (run . subcommands)
+(define (run msg chord . subcommands)
   (~> subcommands
       (append-app-switch)
       ; (append-chord-reset)
       (bash-serialize)
       (collapse)
       (system)
-  ))
+  )
+  (reset! chord)
+  (update-label! msg chord))
 
 (define handle-key-event
   (let ([chord '()])
     (λ (key-event)
-      (define single-key-descriptor (get-single-key-descriptor key-event))
-      (set! chord (++ chord single-key-descriptor))
-      (match chord
-        [(list a ... "q:1") (send frame show #f)] [(list a ... "control:1" "w:1" "w:0") (send frame show #f)]
-        [(list a ... "g:1" "g:0") (reset! chord) (update-label! msg chord)]
+      (case key-event
+        [(lost-focus) (reset! chord) (update-label! msg (list initial-label))]
+        [else 
+          (define single-key-descriptor (get-single-key-descriptor key-event))
+          (set! chord (++ chord single-key-descriptor))
+          (match chord
+            [(list a ... "q:1") (send frame show #f)] [(list a ... "control:1" "w:1" "w:0") (send frame show #f)]
+            [(list a ... "g:1" "g:0") (reset! chord) (update-label! msg chord)]
 
-        [(list "s:1" "s:0" "n:1" "n:0")
-         (run (fire "https://search.nixos.org")) (reset! chord) (update-label! msg chord)]
+            [(list "s:1" "s:0" "n:1" "n:0")
+            (run msg chord (fire "https://search.nixos.org"))]
+            [(list "s:1" "s:0" "o:1" "o:0")
+            (run msg chord (fire "https://search.nixos.org/options"))]
+            [(list "s:1" "s:0" "r:1" "r:0")
+            (run msg chord (fire "https://docs.racket-lang.org/search/index.html"))]
 
-        [(list "s:1" "s:0" "o:1" "o:0")
-         (run (fire "https://search.nixos.org/options"))]
-        [(list "s:1" "s:0" "r:1" "r:0")
-         (run (fire "https://docs.racket-lang.org/search/index.html"))]
-        [_
-         (update-label! msg chord)]
-         ))))
+            [_ (update-label! msg chord)]
+          )]))))
 
 (send my-canvas focus)
 (send frame show #t)
