@@ -1,6 +1,6 @@
 #lang racket/base
 
-(require (for-syntax racket/base)
+(require (for-syntax racket/base syntax/parse)
          racket/gui/base
          racket/class
          racket/system
@@ -150,6 +150,12 @@
   (reset! chord)
   (update-label! msg chord))
 
+(define-syntax (alles stx)
+  (syntax-parse stx
+    [(alles (list keypress ...) command ...)
+     #`'[(list keypress ...)
+        (run msg (list keypress ...) command ...)]]))
+
 (define handle-key-event
   (let ([chord '()])
     (λ (key-event)
@@ -162,8 +168,9 @@
             [(list a ... "q:1") (send frame show #f)] [(list a ... "control:1" "w:1" "w:0") (send frame show #f)]
             [(list a ... "g:1" "g:0") (reset! chord) (update-label! msg chord)]
 
-            [(list "s:1" "s:0" "n:1" "n:0")
-            (run msg chord (fire "https://search.nixos.org"))]
+            (alles (list "s:1" "s:0" "n:1" "n:0") (fire "https://search.nixos.org"))
+            ; [(list "s:1" "s:0" "n:1" "n:0")
+            ; (run msg chord (fire "https://search.nixos.org"))]
             [(list "s:1" "s:0" "o:1" "o:0")
             (run msg chord (fire "https://search.nixos.org/options"))]
             [(list "s:1" "s:0" "r:1" "r:0")
