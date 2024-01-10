@@ -33,6 +33,9 @@
             pkgs.ydotool
             pkgs.fontconfig.lib
           ];
+          devshell.startup = {
+            setup-langserver.text = ''raco pkg install --auto --skip-installed racket-langserver'';
+          };
           commands = [
             { name = "ra"; command = "racket src/alles.rkt"; help = "Runs the 'alles.rkt' program."; }
           ];
