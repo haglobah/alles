@@ -159,8 +159,8 @@
           (define single-key-descriptor (get-single-key-descriptor key-event))
           (set! chord (++ chord single-key-descriptor))
           (match chord
-            [(list a ... "q:1") (send frame show #f)] [(list a ... "control:1" "w:1" "w:0") (send frame show #f)]
-            [(list a ... "g:1" "g:0") (reset! chord) (update-label! msg chord)]
+            [(list _a ... "q:1") (send frame show #f)] [(list _a ... "control:1" "w:1" "w:0") (send frame show #f)]
+            [(list _a ... "g:1" "g:0") (reset! chord) (update-label! msg chord)]
 
             [(list "s:1" "s:0" "n:1" "n:0")
             (run msg chord (fire "https://search.nixos.org"))]
@@ -168,6 +168,8 @@
             (run msg chord (fire "https://search.nixos.org/options"))]
             [(list "s:1" "s:0" "r:1" "r:0")
             (run msg chord (fire "https://docs.racket-lang.org/search/index.html"))]
+            [(list "s:1" "s:0" "e:1" "e:0")
+            (run msg chord (fire "https://hexdocs.pm/elixir/Kernel.html"))]
             
             ; [(list "r:1" "r:0" "f:1" "f:0")
             ; (run msg chord "firefox")]
@@ -182,8 +184,6 @@
 
             [(list "c:1" "c:0" "h:1" "h:0")
             (run msg chord (clip "git@github.com/haglobah"))]
-            [(list "c:1" "c:0" "f:1" "f:0")
-            (run msg chord (clip "nix flake init --template github:haglobah/flakes"))]
 
             [_ (update-label! msg chord)]
           )]))))
