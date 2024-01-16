@@ -161,6 +161,7 @@
           (match chord
             [(list _a ... "q:1") (send frame show #f)] [(list _a ... "control:1" "w:1" "w:0") (send frame show #f)]
             [(list _a ... "g:1" "g:0") (reset! chord) (update-label! msg chord)]
+            [(list _a ... "r:0") (reset! chord) (update-label! msg chord)]
 
             [(list "s:1" "s:0" "n:1" "n:0")
             (run msg chord (fire "https://search.nixos.org"))]
