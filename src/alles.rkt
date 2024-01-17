@@ -5,7 +5,6 @@
          racket/class
          racket/system
          racket/match
-         racket/string
          "threading.rkt")
 
 (define frame
@@ -72,13 +71,13 @@
               (<> " " (car chord-list) ":1 " (car chord-list) ":0"))
           (nesting->sequence (cdr chord-list)))))
 
-(define (keys keychord)
+(define (keys keychord . opts)
   (~>> keychord
        (map symbol->keycode)
        (inspect)
        (nesting->sequence)
        (inspect)
-       (<> "ydotool key")
+       (<> "ydotool key key-delay=100")
        (inspect)
   ))
 
@@ -139,10 +138,14 @@
 ; (define (append-chord-reset subcommands)
 ;   (++ subcommands (reset! chord)))
 
-(define (run msg chord . subcommands)
+(define (run msg chord #:append-switch? [append-switch? #t] . subcommands)
+  (define (maybe-append-switch subs append-switch?)
+    (if append-switch? 
+        (append-app-switch subs)
+        subs))
+
   (~> subcommands
-      (append-app-switch)
-      ; (append-chord-reset)
+      (maybe-append-switch append-switch?)
       (bash-serialize)
       (collapse)
       (system)
@@ -163,28 +166,24 @@
             [(list _a ... "g:1" "g:0") (reset! chord) (update-label! msg chord)]
             [(list _a ... "r:0") (reset! chord) (update-label! msg chord)]
 
-            [(list "s:1" "s:0" "n:1" "n:0")
+            [(list "s:1" "s:0" "p:1" "p:0")
             (run msg chord (fire "https://search.nixos.org"))]
-            [(list "s:1" "s:0" "o:1" "o:0")
+            [(list "s:1" "s:0" "n:1" "n:0")
             (run msg chord (fire "https://search.nixos.org/options"))]
             [(list "s:1" "s:0" "r:1" "r:0")
             (run msg chord (fire "https://docs.racket-lang.org/search/index.html"))]
             [(list "s:1" "s:0" "e:1" "e:0")
             (run msg chord (fire "https://hexdocs.pm/elixir/Kernel.html"))]
             
-            ; [(list "r:1" "r:0" "f:1" "f:0")
-            ; (run msg chord "firefox")]
-            ; [(list "r:1" "r:0" "o:1" "o:0")
-            ; (run msg chord "obsidian")]
-            [(list "r:1" "r:0" "t:1" "t:0")
-            (run msg chord "gnome-terminal")]
-            ; [(list "r:1" "r:0" "c:1" "c:0")
-            ; (run msg chord "code")]
-            ; [(list "r:1" "r:0" "e:1" "e:0")
-            ; (run msg chord "emacs")]
-
+            ; [(list "o:1" "o:0" "s:1" "s:0")
+            ; (run msg chord #:append-switch? #f (keys '((Super o))) "sleep 0.5" (keys '((Ctrl o))))]
+            ; [(list "o:1" "o:0" "r:1" "r:0")
+            ; (run msg chord #:append-switch? #f (keys '((Super o))) "sleep 0.2" (keys '((Ctrl #\.))))]
+            ; [(list "o:1" "o:0" "f:1" "f:0")
+            ; (run msg chord #:append-switch? #f (keys '((Super o))) "sleep 0.2" (keys '((Ctrl (lshift f)))))]
+            
             [(list "c:1" "c:0" "h:1" "h:0")
-            (run msg chord (clip "git@github.com/haglobah"))]
+            (run msg chord (clip "git@github.com/haglobah") (keys '((Ctrl (lshift v)))))]
 
             [_ (update-label! msg chord)]
           )]))))
